@@ -1,5 +1,18 @@
 RM=rm -rf
 CC=gcc
+DEST=/usr
+
+ifeq ($(shell uname -s),Linux)
+    CC=gcc
+    CP=cp
+    DEST=/usr
+else ifeq ($(shell uname -s),Darwin)
+    CC=gcc-14
+    CP=gcp
+    DEST=/usr/local
+else
+    $(error 'OS not supported!')
+endif
 
 C_SRCS=$(shell find . -iname "*.c" | tr '\n' ' ')
 H_SRCS=$(shell find . -iname "*.h" | tr '\n' ' ')
@@ -30,11 +43,11 @@ clean:
 	$(RM) release
 
 install: all
-	cp -u release/libcspecs.so /usr/lib
-	cp --parents -u $(H_SRCS) /usr/include
+	$(CP) -u release/libcspecs.so $(DEST)/lib
+	$(CP) --parents -u $(H_SRCS) $(DEST)/include
 
 uninstall:
-	rm -f /usr/lib/libcspecs.so
-	rm -rf /usr/include/cspecs
+	rm -f $(DEST)/lib/libcspecs.so
+	rm -rf $(DEST)/include/cspecs
 
 .PHONY: all create-dirs clean install uninstall
